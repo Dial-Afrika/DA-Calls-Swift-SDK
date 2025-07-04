@@ -1,0 +1,4 @@
+module DACallsPackageTests {
+    header "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACallsPackageTests.build/DACallsPackageTests-Swift.h"
+    requires objc
+}

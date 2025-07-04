@@ -1,0 +1,177 @@
+import SwiftUI
+import Combine
+import Foundation
+
+/// View model for the call view
+public class DACallViewModel: ObservableObject {
+    @Published var callStatusText: String = "Connecting..."
+    @Published var remoteParty: String = ""
+    @Published var callDuration: String = "00:00"
+    @Published var isIncomingCall: Bool = false
+    @Published var isOutgoingCall: Bool = false
+    @Published var isCallActive: Bool = false
+    @Published var isMuted: Bool = false
+    @Published var isSpeakerOn: Bool = false
+    @Published var callEnded: Bool = false
+    @Published var showKeypad: Bool = false
+    
+    private var cancellables = Set<AnyCancellable>()
+    private var durationTimer: Timer?
+    private var callStartTime: Date?
+    
+    public init() {
+        setupObservers()
+    }
+    
+    deinit {
+        durationTimer?.invalidate()
+    }
+    
+    private func setupObservers() {
+        // Observe current call
+        DACalls.shared.callService.$currentCall
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] call in
+                guard let self = self else { return }
+                
+                if let call = call {
+                    self.remoteParty = call.remoteAddress
+                    self.isIncomingCall = call.direction == .incoming
+                    self.isOutgoingCall = call.direction == .outgoing
+                } else {
+                    // No call, view should be dismissed
+                    self.stopTimer()
+                    self.callEnded = true
+                }
+            }
+            .store(in: &cancellables)
+        
+        // Observe call state
+        DACalls.shared.callService.$callState
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                
+                switch state {
+                case .idle:
+                    self.callStatusText = "No Call"
+                    self.isCallActive = false
+                    self.stopTimer()
+                
+                case .outgoingInit:
+                    self.callStatusText = "Calling..."
+                    self.isCallActive = false
+                    self.isOutgoingCall = true
+                
+                case .outgoingProgress:
+                    self.callStatusText = "Calling..."
+                    self.isCallActive = false
+                
+                case .outgoingRinging:
+                    self.callStatusText = "Ringing..."
+                    self.isCallActive = false
+                
+                case .ringing:
+                    self.callStatusText = "Incoming Call"
+                    self.isCallActive = false
+                
+                case .connecting:
+                    self.callStatusText = "Connecting..."
+                    self.isCallActive = false
+                
+                case .connected, .active:
+                    self.callStatusText = "Connected"
+                    self.isCallActive = true
+                    self.startTimer()
+                
+                case .paused:
+                    self.callStatusText = "On Hold"
+                    self.isCallActive = true
+                
+                case .pausedByRemote:
+                    self.callStatusText = "On Hold by Remote"
+                    self.isCallActive = true
+                
+                case .resuming:
+                    self.callStatusText = "Resuming..."
+                    self.isCallActive = true
+                
+                case .ended:
+                    self.callStatusText = "Call Ended"
+                    self.isCallActive = false
+                    self.stopTimer()
+                    
+                case .error(let message):
+                    self.callStatusText = "Call Failed: \(message)"
+                    self.isCallActive = false
+                    self.stopTimer()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // Observe mute state
+        DACalls.shared.callService.$isMicMuted
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] muted in
+                self?.isMuted = muted
+            }
+            .store(in: &cancellables)
+        
+        // Observe speaker state
+        DACalls.shared.callService.$isSpeakerEnabled
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] speakerOn in
+                self?.isSpeakerOn = speakerOn
+            }
+            .store(in: &cancellables)
+    }
+    
+    /// Start call duration timer
+    private func startTimer() {
+        stopTimer()
+        callStartTime = Date()
+        
+        durationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self = self, let startTime = self.callStartTime else { return }
+            
+            let duration = Int(Date().timeIntervalSince(startTime))
+            let minutes = duration / 60
+            let seconds = duration % 60
+            self.callDuration = String(format: "%02d:%02d", minutes, seconds)
+        }
+    }
+    
+    /// Stop call duration timer
+    private func stopTimer() {
+        durationTimer?.invalidate()
+        durationTimer = nil
+        callStartTime = nil
+    }
+    
+    /// Answer an incoming call
+    @MainActor
+    public func answerCall() async {
+        let _ = await DACalls.shared.callService.answerCall()
+    }
+    
+    /// End the current call
+    @MainActor
+    public func endCall() async {
+        let _ = await DACalls.shared.callService.endCall()
+    }
+    
+    /// Toggle microphone mute state
+    public func toggleMute() {
+        isMuted = DACalls.shared.callService.toggleMicrophone()
+    }
+    
+    /// Toggle speaker state
+    public func toggleSpeaker() {
+        isSpeakerOn = DACalls.shared.callService.toggleSpeaker()
+    }
+    
+    /// Send DTMF tone
+    public func sendDTMF(digit: String) {
+        let _ = DACalls.shared.callService.sendDTMF(digit: digit)
+    }
+}

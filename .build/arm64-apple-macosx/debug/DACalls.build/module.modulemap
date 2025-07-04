@@ -1,0 +1,4 @@
+module DACalls {
+    header "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DACalls-Swift.h"
+    requires objc
+}
