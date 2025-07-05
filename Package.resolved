@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
       "state" : {
-        "branch" : "novideo/stable",
-        "revision" : "6666c1d5adff93d059c6fd817448e680e521d715"
+        "revision" : "2d65f089792cb91c50f51dc26417c7d4c0ebb988",
+        "version" : "5.4.24"
       }
     }
   ],

@@ -3,11 +3,11 @@ import Foundation
 
 // MARK: - Session State Observer
 
-extension DACallService: DASessionStateObserver {
+extension DACallService: @preconcurrency DASessionStateObserver {
     public func onSessionEvent(_ event: DASessionEvent) {
         if case let .call(callEvent) = event {
             switch callEvent {
-            case let .incoming(callId, from):
+            case let .incoming(_, from):
                 // Report incoming call to CallKit if we have a core call
                 if let core = sessionManager.core, let call = core.currentCall {
                     reportIncomingCall(call: call, fromAddress: from)

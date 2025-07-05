@@ -10,18 +10,18 @@ public struct DAAppDelegateHelper {
     /// Initialize DACalls SDK in the application delegate
     /// - Parameter application: The UIApplication instance
     /// - Parameter launchOptions: The launch options dictionary
-    public static func application(
+    @MainActor public static func application(
         _: UIApplication,
-        didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         // Initialize DACalls SDK with default configuration
         let config = DAConfig()
         DACalls.shared.initialize(with: config)
 
-        //        // Handle any push notification in the launch options
-        //        if let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject] {
-        //            DACalls.shared.notificationHandler.processRemoteNotification(remoteNotification.first?.value)
-        //        }
+        // Handle any push notification in the launch options
+        if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+            _ = DACalls.shared.notificationHandler.handlePushNotification(remoteNotification)
+        }
 
         return true
     }

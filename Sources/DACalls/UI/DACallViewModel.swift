@@ -133,12 +133,14 @@ public class DACallViewModel: ObservableObject {
         callStartTime = Date()
 
         durationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self, let startTime = self.callStartTime else { return }
+            Task { @MainActor in
+                guard let self = self, let startTime = self.callStartTime else { return }
 
-            let duration = Int(Date().timeIntervalSince(startTime))
-            let minutes = duration / 60
-            let seconds = duration % 60
-            self.callDuration = String(format: "%02d:%02d", minutes, seconds)
+                let duration = Int(Date().timeIntervalSince(startTime))
+                let minutes = duration / 60
+                let seconds = duration % 60
+                self.callDuration = String(format: "%02d:%02d", minutes, seconds)
+            }
         }
     }
 
@@ -152,13 +154,13 @@ public class DACallViewModel: ObservableObject {
     /// Answer an incoming call
     @MainActor
     public func answerCall() async {
-        let _ = await DACalls.shared.callService.answerCall()
+        _ = await DACalls.shared.callService.answerCall()
     }
 
     /// End the current call
     @MainActor
     public func endCall() async {
-        let _ = await DACalls.shared.callService.endCall()
+        _ = await DACalls.shared.callService.endCall()
     }
 
     /// Toggle microphone mute state
@@ -173,6 +175,6 @@ public class DACallViewModel: ObservableObject {
 
     /// Send DTMF tone
     public func sendDTMF(digit: CChar) {
-        let _ = DACalls.shared.callService.sendDTMF(digit: digit)
+        _ = DACalls.shared.callService.sendDTMF(digit: digit)
     }
 }
