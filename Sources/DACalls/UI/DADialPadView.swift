@@ -1,21 +1,21 @@
-import SwiftUI
 import Foundation
+import SwiftUI
 
 /// Dialpad view for DTMF input
 public struct DADialPadView: View {
-    var onDigitPressed: (String) -> Void
-    
-    let buttons: [[String]] = [
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["7", "8", "9"],
-        ["*", "0", "#"]
+    var onDigitPressed: (CChar) -> Void
+
+    let buttons: [[Int8]] = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [0, 0, 0],
     ]
-    
-    public init(onDigitPressed: @escaping (String) -> Void) {
+
+    public init(onDigitPressed: @escaping (CChar) -> Void) {
         self.onDigitPressed = onDigitPressed
     }
-    
+
     public var body: some View {
         VStack(spacing: 8) {
             ForEach(buttons, id: \.self) { row in

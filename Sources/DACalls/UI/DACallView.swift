@@ -1,19 +1,19 @@
-import SwiftUI
 import Combine
 import Foundation
+import SwiftUI
 
 /// View for managing active calls
 public struct DACallView: View {
     @StateObject private var viewModel = DACallViewModel()
-    
+
     /// Called when a call ends and the view should be dismissed
     public var onCallEnded: (() -> Void)?
-    
+
     /// Public initializer
     public init(onCallEnded: (() -> Void)? = nil) {
         self.onCallEnded = onCallEnded
     }
-    
+
     public var body: some View {
         VStack(spacing: 30) {
             // Call status and remote identity
@@ -21,21 +21,20 @@ public struct DACallView: View {
                 Text(viewModel.callStatusText)
                     .font(.headline)
                     .foregroundColor(.secondary)
-                
+
                 Text(viewModel.remoteParty)
                     .font(.largeTitle)
                     .bold()
-                
+
                 if viewModel.isCallActive {
                     Text(viewModel.callDuration)
                         .font(.title3)
-                        .monospacedDigit()
                 }
             }
             .padding()
-            
+
             Spacer()
-            
+
             // Call controls
             if viewModel.isIncomingCall {
                 // Incoming call controls
@@ -55,13 +54,13 @@ public struct DACallView: View {
                                         .font(.system(size: 28))
                                         .foregroundColor(.white)
                                 )
-                            
+
                             Text("Decline")
                                 .font(.caption)
                                 .padding(.top, 5)
                         }
                     }
-                    
+
                     // Accept button
                     Button(action: {
                         Task {
@@ -77,7 +76,7 @@ public struct DACallView: View {
                                         .font(.system(size: 28))
                                         .foregroundColor(.white)
                                 )
-                            
+
                             Text("Answer")
                                 .font(.caption)
                                 .padding(.top, 5)
@@ -101,13 +100,13 @@ public struct DACallView: View {
                                             .font(.system(size: 24))
                                             .foregroundColor(viewModel.isMuted ? .white : .gray)
                                     )
-                                
+
                                 Text("Mute")
                                     .font(.caption)
                                     .padding(.top, 5)
                             }
                         }
-                        
+
                         // Speaker button
                         Button(action: {
                             viewModel.toggleSpeaker()
@@ -121,13 +120,13 @@ public struct DACallView: View {
                                             .font(.system(size: 24))
                                             .foregroundColor(viewModel.isSpeakerOn ? .white : .gray)
                                     )
-                                
+
                                 Text("Speaker")
                                     .font(.caption)
                                     .padding(.top, 5)
                             }
                         }
-                        
+
                         // Keypad button
                         Button(action: {
                             viewModel.showKeypad.toggle()
@@ -141,14 +140,14 @@ public struct DACallView: View {
                                             .font(.system(size: 24))
                                             .foregroundColor(viewModel.showKeypad ? .white : .gray)
                                     )
-                                
+
                                 Text("Keypad")
                                     .font(.caption)
                                     .padding(.top, 5)
                             }
                         }
                     }
-                    
+
                     // Show keypad if enabled
                     if viewModel.showKeypad {
                         DADialPadView(onDigitPressed: { digit in
@@ -158,9 +157,9 @@ public struct DACallView: View {
                     }
                 }
             }
-            
+
             Spacer()
-            
+
             // End call button (always visible for ongoing calls)
             if viewModel.isCallActive || viewModel.isOutgoingCall {
                 Button(action: {

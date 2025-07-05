@@ -1,0 +1,64 @@
+disabled_rules:
+  - trailing_whitespace
+  - identifier_name
+  - force_cast
+  - opening_brace
+
+opt_in_rules:
+  - empty_count
+  - fatal_error_message
+  - array_init
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - discouraged_direct_init
+  - empty_string
+  - first_where
+  - last_where
+  - multiline_parameters
+  - sorted_first_last
+  - unused_import
+  - vertical_parameter_alignment_on_call
+  - vertical_whitespace_closing_braces
+  - void_return
+  - trailing_closure
+  - prefer_self_type_over_type_of_self
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - Carthage
+  - Pods
+  - Vendor
+  - Generated
+
+line_length: 120
+
+type_name:
+  min_length: 3
+  max_length: 40
+
+nesting:
+  type_level: 3
+
+function_body_length:
+  warning: 60
+  error: 100
+
+file_length:
+  warning: 500
+  error: 1000
+
+cyclomatic_complexity:
+  warning: 15
+  error: 25
+
+function_parameter_count:
+  warning: 6
+  error: 8

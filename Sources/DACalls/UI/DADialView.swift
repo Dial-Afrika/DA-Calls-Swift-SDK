@@ -1,19 +1,19 @@
-import SwiftUI
 import Foundation
+import SwiftUI
 
 /// View for initiating outgoing calls
 public struct DADialView: View {
     @State private var destinationNumber: String = ""
     @State private var isCallInProgress: Bool = false
-    
+
     /// Called when a call is initiated
     public var onCallStarted: (() -> Void)?
-    
+
     /// Public initializer
     public init(onCallStarted: (() -> Void)? = nil) {
         self.onCallStarted = onCallStarted
     }
-    
+
     public var body: some View {
         VStack(spacing: 20) {
             // Destination input
@@ -22,12 +22,12 @@ public struct DADialView: View {
                 .padding()
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
-            
+
             // Dial pad
             DADialPadView(onDigitPressed: { digit in
-                destinationNumber += digit
+                destinationNumber += "\(digit)"
             })
-            
+
             // Call button
             Button(action: {
                 makeCall()
@@ -46,7 +46,7 @@ public struct DADialView: View {
         }
         .padding()
     }
-    
+
     /// Make an outgoing call
     private func makeCall() {
         // Format the SIP address if needed
@@ -58,7 +58,7 @@ public struct DADialView: View {
             // Address has @ but no sip: prefix
             address = "sip:\(address)"
         }
-        
+
         Task {
             let result = await DACalls.shared.callService.makeCall(to: address)
             switch result {

@@ -1,15 +1,16 @@
-import SwiftUI
 import Combine
 import Foundation
+import SwiftUI
 
 /// A complete VoIP call screen with login, dialpad, and call management
+@MainActor
 public struct DACallScreen: View {
     @State private var isLoggedIn = false
     @State private var isCallActive = false
-    
+
     /// Public initializer
     public init() {}
-    
+
     public var body: some View {
         NavigationView {
             if !isLoggedIn {
@@ -42,12 +43,12 @@ public struct DACallScreen: View {
             checkLoginStatus()
         }
     }
-    
+
     /// Check if user is already logged in
     private func checkLoginStatus() {
         isLoggedIn = DACalls.shared.authService.isLoggedIn
     }
-    
+
     /// Logout and return to login screen
     private func logout() {
         Task {
@@ -58,18 +59,19 @@ public struct DACallScreen: View {
 }
 
 /// View model for the call screen
+@MainActor
 public class DACallScreenViewModel: ObservableObject {
     @Published var isLoggedIn: Bool = false
     @Published var isCallActive: Bool = false
-    
+
     private var cancellables = Set<AnyCancellable>()
-    
+
     init() {
         // Subscribe to auth state changes
         DACalls.shared.authService.$isLoggedIn
             .receive(on: DispatchQueue.main)
             .assign(to: &$isLoggedIn)
-        
+
         // Subscribe to call state changes
         DACalls.shared.callService.$callState
             .receive(on: DispatchQueue.main)
@@ -88,7 +90,7 @@ public class DACallScreenViewModel: ObservableObject {
 /// Navigation helper for presenting the call screen
 public struct DACallNavigation: ViewModifier {
     @Binding var isPresented: Bool
-    
+
     public func body(content: Content) -> some View {
         content
             .fullScreenCover(isPresented: $isPresented) {
@@ -102,7 +104,7 @@ public extension View {
     /// - Parameter isPresented: Binding to control the presentation state
     /// - Returns: Modified view with the call screen presentation
     func callScreen(isPresented: Binding<Bool>) -> some View {
-        self.modifier(DACallNavigation(isPresented: isPresented))
+        modifier(DACallNavigation(isPresented: isPresented))
     }
 }
 

@@ -1,10 +1,11 @@
-import Foundation
 import CallKit
+import Foundation
 
 // MARK: - CXProviderDelegate
-extension DACallService: CXProviderDelegate {
+
+extension DACallService: @preconcurrency CXProviderDelegate {
     /// Called when the provider has been reset
-    public func providerDidReset(_ provider: CXProvider) {
+    public func providerDidReset(_: CXProvider) {
         // Handle provider reset - terminate all calls
         if let core = sessionManager.core, core.callsNb > 0 {
             for call in core.calls {
@@ -16,24 +17,24 @@ extension DACallService: CXProviderDelegate {
             }
         }
     }
-    
+
     /// Called when a call is started from CallKit
-    public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
+    public func provider(_: CXProvider, perform action: CXStartCallAction) {
         // The actual call is made in makeCall method
         // Just fulfill the action here
         action.fulfill()
     }
-    
+
     /// Called when a call is answered from CallKit
-    public func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
+    public func provider(_: CXProvider, perform action: CXAnswerCallAction) {
         guard let core = sessionManager.core, let call = core.currentCall else {
             action.fail()
             return
         }
-        
+
         // Configure audio session before answering
         core.configureAudioSession()
-        
+
         do {
             try call.accept()
             action.fulfill()
@@ -42,14 +43,14 @@ extension DACallService: CXProviderDelegate {
             action.fail()
         }
     }
-    
+
     /// Called when a call is ended from CallKit
-    public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
+    public func provider(_: CXProvider, perform action: CXEndCallAction) {
         guard let core = sessionManager.core else {
             action.fail()
             return
         }
-        
+
         // Find and terminate the call
         if let call = core.currentCall {
             do {
@@ -73,14 +74,14 @@ extension DACallService: CXProviderDelegate {
             action.fulfill()
         }
     }
-    
+
     /// Called when a call is put on hold from CallKit
-    public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
+    public func provider(_: CXProvider, perform action: CXSetHeldCallAction) {
         guard let core = sessionManager.core, let call = core.currentCall else {
             action.fail()
             return
         }
-        
+
         do {
             if action.isOnHold {
                 try call.pause()
@@ -93,29 +94,33 @@ extension DACallService: CXProviderDelegate {
             action.fail()
         }
     }
-    
+
     /// Called when mute is toggled from CallKit
-    public func provider(_ provider: CXProvider, perform action: CXSetMutedCallAction) {
+    public func provider(_: CXProvider, perform action: CXSetMutedCallAction) {
         guard let core = sessionManager.core else {
             action.fail()
             return
         }
-        
+
         core.micEnabled = !action.isMuted
-        isMicMuted = action.isMuted
+        setMicMuted(action.isMuted)
         action.fulfill()
     }
-    
+
     /// Called when DTMF is sent from CallKit
-    public func provider(_ provider: CXProvider, perform action: CXPlayDTMFCallAction) {
+    public func provider(_: CXProvider, perform action: CXPlayDTMFCallAction) {
         guard let core = sessionManager.core, let call = core.currentCall else {
             action.fail()
             return
         }
-        
+
         do {
             for digit in action.digits {
-                try call.sendDtmf(dtmf: digit)
+                // Convert each character to CChar for DTMF
+                if let asciiValue = digit.asciiValue {
+                    let cChar = CChar(asciiValue)
+                    try call.sendDtmf(dtmf: cChar)
+                }
             }
             action.fulfill()
         } catch {

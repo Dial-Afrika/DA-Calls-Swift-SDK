@@ -1,48 +1,46 @@
-import Foundation
 import CallKit
+import Foundation
 
 // MARK: - Session State Observer
+
 extension DACallService: DASessionStateObserver {
     public func onSessionEvent(_ event: DASessionEvent) {
-        if case .call(let callEvent) = event {
+        if case let .call(callEvent) = event {
             switch callEvent {
-            case .incoming(let callId, let from):
+            case let .incoming(callId, from):
                 // Report incoming call to CallKit if we have a core call
                 if let core = sessionManager.core, let call = core.currentCall {
                     reportIncomingCall(call: call, fromAddress: from)
                 }
-                
+
             case .outgoingInit:
-                callState = .outgoingInit
-                
+                setCallState(.outgoingInit)
+
             case .outgoingProgress:
-                callState = .outgoingProgress
-                
+                setCallState(.outgoingProgress)
+
             case .outgoingRinging:
-                callState = .outgoingRinging
-                
+                setCallState(.outgoingRinging)
+
             case .connected:
-                callState = .connected
-                
+                setCallState(.connected)
+
             case .streamsRunning:
-                callState = .active
-                
-            case .paused(_, let byRemote):
-                callState = byRemote ? .pausedByRemote : .paused
-                
+                setCallState(.active)
+
+            case let .paused(_, byRemote):
+                setCallState(byRemote ? .pausedByRemote : .paused)
+
             case .resuming:
-                callState = .resuming
-                
+                setCallState(.resuming)
+
             case .terminated:
                 // Reset call state
-                callState = .ended
-                currentCall = nil
-                callUUID = nil
-                isMicMuted = false
-                isSpeakerEnabled = false
-                
-            default:
-                break
+                setCallState(.ended)
+                setCurrentCall(nil)
+                setCallUUID(nil)
+                setMicMuted(false)
+                setSpeakerEnabled(false)
             }
         }
     }

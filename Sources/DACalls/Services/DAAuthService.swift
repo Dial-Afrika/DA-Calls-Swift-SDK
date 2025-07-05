@@ -1,39 +1,39 @@
+import Combine
 import Foundation
 import linphonesw
-import Combine
 
 /// Service for handling authentication and SIP registration
 @MainActor
 public class DAAuthService {
     /// The core session manager
     private let sessionManager: DASessionManager
-    
+
     /// Current registration state
     @Published public private(set) var registrationState: DARegistrationState = .none
-    
+
     /// Current username
     @Published public private(set) var currentUsername: String = ""
-    
+
     /// Current domain
     @Published public private(set) var currentDomain: String = ""
-    
+
     /// Whether user is logged in
     @Published public private(set) var isLoggedIn: Bool = false
-    
+
     /// Authentication credentials
     public struct Credentials {
         /// Username for SIP authentication
         public let username: String
-        
+
         /// Password for SIP authentication
         public let password: String
-        
+
         /// Domain for SIP authentication
         public let domain: String
-        
+
         /// Transport type for SIP (defaults to TLS)
         public let transportType: DATransportType
-        
+
         /// Initialize with the required credentials
         public init(
             username: String,
@@ -47,16 +47,16 @@ public class DAAuthService {
             self.transportType = transportType
         }
     }
-    
+
     /// Initialize a new authentication service
     /// - Parameter sessionManager: The session manager instance
     init(sessionManager: DASessionManager) {
         self.sessionManager = sessionManager
-        
+
         // Register as observer for session events
         sessionManager.addObserver(self)
     }
-    
+
     /// Login to the SIP server with the provided credentials
     /// - Parameter credentials: The authentication credentials
     /// - Returns: A result indicating success or failure
@@ -65,11 +65,11 @@ public class DAAuthService {
         guard let core = sessionManager.core else {
             return .failure(.notInitialized)
         }
-        
+
         // Update published properties
         currentUsername = credentials.username
         currentDomain = credentials.domain
-        
+
         // Convert transport type
         let transport: TransportType
         switch credentials.transportType {
@@ -80,7 +80,7 @@ public class DAAuthService {
         case .udp:
             transport = .Udp
         }
-        
+
         do {
             // Create auth info
             let authInfo = try Factory.Instance.createAuthInfo(
@@ -91,26 +91,27 @@ public class DAAuthService {
                 realm: "",
                 domain: credentials.domain
             )
-            
+
             // Create account params
             let accountParams = try core.createAccountParams()
-            
+
             // Set identity address
-            let identity = try Factory.Instance.createAddress(addr: "sip:\(credentials.username)@\(credentials.domain)")
+            let identity = try Factory.Instance.createAddress(
+                addr: "sip:\(credentials.username)@\(credentials.domain)")
             try accountParams.setIdentityaddress(newValue: identity)
-            
+
             // Set server address
             let address = try Factory.Instance.createAddress(addr: "sip:\(credentials.domain)")
             try address.setTransport(newValue: transport)
             try accountParams.setServeraddress(newValue: address)
-            
+
             // Enable registration
             accountParams.registerEnabled = true
-            
+
             // Enable push notifications if configured
             if let config = sessionManager.config, config.pushConfig.enabled {
                 accountParams.pushNotificationAllowed = true
-                
+
                 // Set appropriate push provider based on sandbox setting
                 if config.pushConfig.sandbox {
                     accountParams.pushNotificationConfig?.provider = "apns.dev"
@@ -118,26 +119,26 @@ public class DAAuthService {
                     accountParams.pushNotificationConfig?.provider = "apns"
                 }
             }
-            
+
             // Create account
             let account = try core.createAccount(params: accountParams)
-            
+
             // Add auth info and account to core
             core.addAuthInfo(info: authInfo)
             try core.addAccount(account: account)
-            
+
             // Set as default account
             core.defaultAccount = account
-            
+
             // Update registration state
             registrationState = .inProgress
-            
+
             return .success(())
         } catch {
             return .failure(.loginFailed(error.localizedDescription))
         }
     }
-    
+
     /// Logout from the SIP server
     /// - Returns: A result indicating success or failure
     @discardableResult
@@ -145,23 +146,23 @@ public class DAAuthService {
         guard let core = sessionManager.core else {
             return .failure(.notInitialized)
         }
-        
+
         if let account = core.defaultAccount {
             // Disable registration
             let params = account.params
             let clonedParams = params?.clone()
             clonedParams?.registerEnabled = false
             account.params = clonedParams
-            
+
             registrationState = .unregistered
             isLoggedIn = false
-            
+
             return .success(())
         } else {
             return .failure(.notLoggedIn)
         }
     }
-    
+
     /// Delete the current account and clear all auth info
     /// - Returns: A result indicating success or failure
     @discardableResult
@@ -169,18 +170,18 @@ public class DAAuthService {
         guard let core = sessionManager.core else {
             return .failure(.notInitialized)
         }
-        
+
         if let account = core.defaultAccount {
             core.removeAccount(account: account)
             core.clearAccounts()
             core.clearAllAuthInfo()
-            
+
             // Reset state
             currentUsername = ""
             currentDomain = ""
             registrationState = .none
             isLoggedIn = false
-            
+
             return .success(())
         } else {
             return .failure(.notLoggedIn)
@@ -189,9 +190,10 @@ public class DAAuthService {
 }
 
 // MARK: - Session State Observer
-extension DAAuthService: DASessionStateObserver {
+
+extension DAAuthService: @preconcurrency DASessionStateObserver {
     public func onSessionEvent(_ event: DASessionEvent) {
-        if case .registration(let registrationEvent) = event {
+        if case let .registration(registrationEvent) = event {
             switch registrationEvent {
             case .inProgress:
                 registrationState = .inProgress
@@ -199,7 +201,7 @@ extension DAAuthService: DASessionStateObserver {
             case .registered:
                 registrationState = .registered
                 isLoggedIn = true
-            case .failed(let message):
+            case let .failed(message):
                 registrationState = .failed(message)
                 isLoggedIn = false
             case .unregistered:
@@ -214,19 +216,19 @@ extension DAAuthService: DASessionStateObserver {
 public enum DARegistrationState: Equatable {
     /// No registration attempt
     case none
-    
+
     /// Registration in progress
     case inProgress
-    
+
     /// Successfully registered
     case registered
-    
+
     /// Registration failed with error message
     case failed(String)
-    
+
     /// Unregistered
     case unregistered
-    
+
     public static func == (lhs: DARegistrationState, rhs: DARegistrationState) -> Bool {
         switch (lhs, rhs) {
         case (.none, .none),
@@ -246,10 +248,10 @@ public enum DARegistrationState: Equatable {
 public enum DATransportType {
     /// TLS transport (recommended for security)
     case tls
-    
+
     /// TCP transport
     case tcp
-    
+
     /// UDP transport
     case udp
 }
@@ -258,16 +260,22 @@ public enum DATransportType {
 public enum DAError: Error {
     /// SDK is not initialized
     case notInitialized
-    
+
     /// User is not logged in
     case notLoggedIn
-    
+
     /// Login failed with error message
     case loginFailed(String)
-    
+
     /// Invalid parameters
     case invalidParameters(String)
-    
+
     /// Unknown error
     case unknown(String)
+
+    /// Call failed with error message
+    case callFailed(String)
+
+    /// No active call
+    case noActiveCall
 }
