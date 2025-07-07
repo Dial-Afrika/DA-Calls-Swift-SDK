@@ -5,16 +5,16 @@ import SwiftUI
 /// View model for the call view
 @MainActor
 public class DACallViewModel: ObservableObject {
-    @Published var callStatusText: String = "Connecting..."
-    @Published var remoteParty: String = ""
-    @Published var callDuration: String = "00:00"
-    @Published var isIncomingCall: Bool = false
-    @Published var isOutgoingCall: Bool = false
-    @Published var isCallActive: Bool = false
-    @Published var isMuted: Bool = false
-    @Published var isSpeakerOn: Bool = false
-    @Published var callEnded: Bool = false
-    @Published var showKeypad: Bool = false
+    @Published public var callStatusText: String = "Connecting..."
+    @Published public var remoteParty: String = ""
+    @Published public var callDuration: String = "00:00"
+    @Published public var isIncomingCall: Bool = false
+    @Published public var isOutgoingCall: Bool = false
+    @Published public var isCallActive: Bool = false
+    @Published public var isMuted: Bool = false
+    @Published public var isSpeakerOn: Bool = false
+    @Published public var callEnded: Bool = false
+    @Published public var showKeypad: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
     private var durationTimer: Timer?

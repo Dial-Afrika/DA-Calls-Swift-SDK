@@ -16,11 +16,13 @@ public class DASessionManager {
     /// Observers for state changes
     private var stateObservers = [DASessionStateObserver]()
 
-    /// Initialize a new DASessionManager
-    init() {}
-
     /// Configuration used for this session
-    public var config: DAConfig?
+    public var config: DAConfig = .init()
+
+    /// Initialize a new DASessionManager
+    init() {
+        core?.disableChat(denyReason: .None)
+    }
 
     /// Initialize the session manager with configuration
     /// - Parameter config: The configuration for the SDK

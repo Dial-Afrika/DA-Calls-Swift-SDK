@@ -101,7 +101,8 @@ public class DACallService: NSObject {
 
         do {
             // Create the remote address
-            let remoteAddress = try Factory.Instance.createAddress(addr: address)
+            let addr = "sip:\(address)@\(sessionManager.config.domain)"
+            let remoteAddress = try Factory.Instance.createAddress(addr: addr)
 
             // Create call params
             let params = try core.createCallParams(call: nil)

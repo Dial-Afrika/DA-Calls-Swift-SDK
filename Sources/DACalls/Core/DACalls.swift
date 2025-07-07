@@ -22,15 +22,16 @@ public class DACalls {
     /// Private initializer to ensure singleton pattern
     private init() {
         sessionManager = DASessionManager()
-        authService = DAAuthService(sessionManager: sessionManager)
+        authService = DAAuthService()
         callService = DACallService(sessionManager: sessionManager)
         notificationHandler = DANotificationHandler(sessionManager: sessionManager)
     }
 
     /// Initialize the SDK with specific configuration
     /// - Parameter config: The configuration for the SDK
-    public func initialize(with config: DAConfig) {
+    public func initialize(with config: DAConfig) async {
         sessionManager.initialize(with: config)
+        await authService.initialize(sessionManager: sessionManager, username: config.username, password: config.password, domain: config.domain)
     }
 
     /// Shut down the SDK gracefully

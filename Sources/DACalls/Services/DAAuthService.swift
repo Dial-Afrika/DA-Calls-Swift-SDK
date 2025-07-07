@@ -6,7 +6,7 @@ import linphonesw
 @MainActor
 public class DAAuthService {
     /// The core session manager
-    private let sessionManager: DASessionManager
+    private var sessionManager: DASessionManager = .init()
 
     /// Current registration state
     @Published public private(set) var registrationState: DARegistrationState = .none
@@ -23,23 +23,23 @@ public class DAAuthService {
     /// Authentication credentials
     public struct Credentials {
         /// Username for SIP authentication
-        public let username: String
+        public var username: String
 
         /// Password for SIP authentication
-        public let password: String
+        public var password: String
 
         /// Domain for SIP authentication
-        public let domain: String
+        public var domain: String
 
         /// Transport type for SIP (defaults to TLS)
-        public let transportType: DATransportType
+        public var transportType: DATransportType
 
         /// Initialize with the required credentials
         public init(
             username: String,
             password: String,
             domain: String,
-            transportType: DATransportType = .tls
+            transportType: DATransportType = .udp
         ) {
             self.username = username
             self.password = password
@@ -49,12 +49,20 @@ public class DAAuthService {
     }
 
     /// Initialize a new authentication service
-    /// - Parameter sessionManager: The session manager instance
-    init(sessionManager: DASessionManager) {
-        self.sessionManager = sessionManager
+    init() {}
 
+    /// Initialize with configs
+    /// - Parameter sessionManager: The session manager instance
+    /// - Parameter username: The SIP extension
+    /// - Parameter password: The Sip Account Password
+    /// - Parameter Domain: The SIP server
+    @MainActor
+    public func initialize(sessionManager: DASessionManager, username: String, password: String, domain: String) async {
+        self.sessionManager = sessionManager
         // Register as observer for session events
         sessionManager.addObserver(self)
+        let credentials = Credentials(username: username, password: password, domain: domain)
+        await login(with: credentials)
     }
 
     /// Login to the SIP server with the provided credentials
@@ -108,8 +116,9 @@ public class DAAuthService {
             // Enable registration
             accountParams.registerEnabled = true
 
+            let config = sessionManager.config
             // Enable push notifications if configured
-            if let config = sessionManager.config, config.pushConfig.enabled {
+            if config.pushConfig.enabled {
                 accountParams.pushNotificationAllowed = true
 
                 // Set appropriate push provider based on sandbox setting
@@ -119,6 +128,7 @@ public class DAAuthService {
                     accountParams.pushNotificationConfig?.provider = "apns"
                 }
             }
+            // +254 702 653 397
 
             // Create account
             let account = try core.createAccount(params: accountParams)
@@ -278,4 +288,7 @@ public enum DAError: Error {
 
     /// No active call
     case noActiveCall
+
+    /// Not Configured
+    case notConfigured
 }
