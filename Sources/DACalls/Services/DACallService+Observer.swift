@@ -34,10 +34,27 @@ extension DACallService: @preconcurrency DASessionStateObserver {
             case .resuming:
                 setCallState(.resuming)
 
-            case .terminated:
-                // Reset call state
-                setCallState(.ended)
+            case let .terminated(_, reason):
+                // Check if this is a call failure or normal termination
+                if reason.lowercased().contains("failed") ||
+                    reason.lowercased().contains("error") ||
+                    reason.lowercased().contains("declined") ||
+                    reason.lowercased().contains("rejected")
+                {
+                    // Handle call failure
+                    setCallState(.error("Call failed: \(reason)"))
+                } else {
+                    // Normal call termination
+                    setCallState(.ended)
+                }
+
+                // Clean up call state
                 setCurrentCall(nil)
+
+                // Clean up CallKit call if it exists
+                if let uuid = callUUID {
+                    endCallKitCall(uuid: uuid)
+                }
                 setCallUUID(nil)
                 setMicMuted(false)
                 setSpeakerEnabled(false)

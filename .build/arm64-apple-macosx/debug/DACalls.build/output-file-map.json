@@ -68,12 +68,6 @@
     "swiftmodule": "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DANotificationHandler~partial.swiftmodule",
     "swift-dependencies": "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DANotificationHandler.swiftdeps"
   },
-  "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/Sources/DACalls/UI/DACallScreen.swift": {
-    "dependencies": "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DACallScreen.d",
-    "object": "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DACallScreen.swift.o",
-    "swiftmodule": "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DACallScreen~partial.swiftmodule",
-    "swift-dependencies": "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DACallScreen.swiftdeps"
-  },
   "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/Sources/DACalls/UI/DACallView.swift": {
     "dependencies": "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DACallView.d",
     "object": "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/arm64-apple-macosx/debug/DACalls.build/DACallView.swift.o",

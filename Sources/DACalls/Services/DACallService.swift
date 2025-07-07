@@ -280,4 +280,17 @@ public class DACallService: NSObject {
         currentCall = daCall
         callState = .ringing
     }
+
+    /// End a CallKit call programmatically
+    /// - Parameter uuid: The UUID of the call to end
+    public func endCallKitCall(uuid: UUID) {
+        let endCallAction = CXEndCallAction(call: uuid)
+        let transaction = CXTransaction(action: endCallAction)
+
+        callController.request(transaction) { error in
+            if let error = error {
+                print("Failed to end CallKit call: \(error.localizedDescription)")
+            }
+        }
+    }
 }
