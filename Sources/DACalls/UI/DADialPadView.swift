@@ -39,9 +39,3 @@ public struct DADialPadView: View {
         }
     }
 }
-
-#Preview {
-    DADialPadView { digit in
-        print("Pressed \(digit)")
-    }
-}

@@ -71,7 +71,3 @@ public struct DADialView: View {
         }
     }
 }
-
-#Preview {
-    DADialView()
-}

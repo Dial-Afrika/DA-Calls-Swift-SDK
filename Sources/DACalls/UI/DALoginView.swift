@@ -1,19 +1,19 @@
-import SwiftUI
 import Combine
 import Foundation
+import SwiftUI
 
 /// Login view for SIP authentication
 public struct DALoginView: View {
     @StateObject private var viewModel = DALoginViewModel()
-    
+
     /// Completion handler called when login is complete
     public var onLoginComplete: ((Bool) -> Void)?
-    
+
     /// Public initializer
     public init(onLoginComplete: ((Bool) -> Void)? = nil) {
         self.onLoginComplete = onLoginComplete
     }
-    
+
     public var body: some View {
         VStack(spacing: 24) {
             // Header
@@ -21,12 +21,12 @@ public struct DALoginView: View {
                 Text("Login to DialAfrika")
                     .font(.title)
                     .bold()
-                
+
                 Text("Enter your SIP credentials to connect")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            
+
             // Form fields
             VStack(spacing: 16) {
                 TextField("Username", text: $viewModel.username)
@@ -34,16 +34,16 @@ public struct DALoginView: View {
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .keyboardType(.emailAddress)
-                
+
                 SecureField("Password", text: $viewModel.password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                
+
                 TextField("Domain", text: $viewModel.domain)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .keyboardType(.URL)
-                
+
                 Picker("Transport", selection: $viewModel.transportType) {
                     Text("TLS").tag(DATransportType.tls)
                     Text("TCP").tag(DATransportType.tcp)
@@ -51,7 +51,7 @@ public struct DALoginView: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
             }
-            
+
             // Error message
             if !viewModel.errorMessage.isEmpty {
                 Text(viewModel.errorMessage)
@@ -60,7 +60,7 @@ public struct DALoginView: View {
                     .multilineTextAlignment(.center)
                     .padding(.top, 4)
             }
-            
+
             // Login button
             Button(action: {
                 Task {
@@ -101,49 +101,49 @@ public class DALoginViewModel: ObservableObject {
     @Published var errorMessage: String = ""
     @Published var isLoggingIn: Bool = false
     @Published var loginResult: Bool?
-    
+
     private var cancellables = Set<AnyCancellable>()
-    
+
     public init() {
         setupValidation()
     }
-    
+
     var isFormValid: Bool {
         !username.isEmpty && !password.isEmpty && !domain.isEmpty
     }
-    
+
     private func setupValidation() {
         // Reset error message when form fields change
         Publishers.CombineLatest3($username, $password, $domain)
             .map { _ in "" }
             .assign(to: &$errorMessage)
     }
-    
+
     @MainActor
     func login() async {
         guard isFormValid else { return }
-        
+
         isLoggingIn = true
         errorMessage = ""
         loginResult = nil
-        
+
         let credentials = DAAuthService.Credentials(
             username: username,
             password: password,
             domain: domain,
             transportType: transportType
         )
-        
+
         let result = await DACalls.shared.authService.login(with: credentials)
-        
+
         isLoggingIn = false
-        
+
         switch result {
         case .success:
             loginResult = true
-        case .failure(let error):
+        case let .failure(error):
             switch error {
-            case .loginFailed(let message):
+            case let .loginFailed(message):
                 errorMessage = "Login failed: \(message)"
             case .notInitialized:
                 errorMessage = "SDK not initialized"
@@ -153,8 +153,4 @@ public class DALoginViewModel: ObservableObject {
             loginResult = false
         }
     }
-}
-
-#Preview {
-    DALoginView()
 }

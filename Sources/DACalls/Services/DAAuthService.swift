@@ -128,7 +128,6 @@ public class DAAuthService {
                     accountParams.pushNotificationConfig?.provider = "apns"
                 }
             }
-            // +254 702 653 397
 
             // Create account
             let account = try core.createAccount(params: accountParams)

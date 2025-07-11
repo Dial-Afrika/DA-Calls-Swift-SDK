@@ -1,5 +1,7 @@
+import AVFoundation
 import Foundation
 import linphonesw
+import UIKit
 
 /// Main entry point to access all functionality of the DACalls SDK
 @MainActor
@@ -31,7 +33,37 @@ public class DACalls {
     /// - Parameter config: The configuration for the SDK
     public func initialize(with config: DAConfig) async {
         sessionManager.initialize(with: config)
-        await authService.initialize(sessionManager: sessionManager, username: config.username, password: config.password, domain: config.domain)
+        requestMicrophonePermission { granted in
+            if granted {
+                await self.authService.initialize(sessionManager: self.sessionManager, username: config.username, password: config.password, domain: config.domain)
+            } else {
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString),
+                   UIApplication.shared.canOpenURL(settingsURL)
+                {
+                    await UIApplication.shared.open(settingsURL)
+                }
+            }
+        }
+    }
+
+    /// Get microphone permission
+    func requestMicrophonePermission(completion: @escaping @Sendable (Bool) async -> Void) {
+        switch AVAudioSession.sharedInstance().recordPermission {
+        case .undetermined:
+            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                Task {
+                    await completion(granted)
+                }
+            }
+        case .granted, .denied:
+            Task {
+                await completion(AVAudioSession.sharedInstance().recordPermission == .granted)
+            }
+        @unknown default:
+            Task {
+                await completion(false)
+            }
+        }
     }
 
     /// Shut down the SDK gracefully

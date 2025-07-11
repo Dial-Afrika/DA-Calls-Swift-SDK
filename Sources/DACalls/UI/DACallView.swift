@@ -188,7 +188,3 @@ public struct DACallView: View {
         }
     }
 }
-
-#Preview {
-    DACallView()
-}
