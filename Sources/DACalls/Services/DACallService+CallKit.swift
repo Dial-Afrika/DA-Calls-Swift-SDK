@@ -1,3 +1,4 @@
+import AVFoundation
 import CallKit
 import Foundation
 
@@ -31,7 +32,6 @@ extension DACallService: @preconcurrency CXProviderDelegate {
             action.fail()
             return
         }
-
         // Configure audio session before answering
         core.configureAudioSession()
 
@@ -127,5 +127,16 @@ extension DACallService: @preconcurrency CXProviderDelegate {
             print("Error sending DTMF: \(error.localizedDescription)")
             action.fail()
         }
+    }
+
+    public func provider(_: CXProvider, didActivate _: AVAudioSession) {
+        // The linphone Core must be notified that CallKit has activated the AVAudioSession
+        // in order to start streaming audio.
+        sessionManager.core?.activateAudioSession(activated: true)
+    }
+
+    public func provider(_: CXProvider, didDeactivate _: AVAudioSession) {
+        // The linphone Core must be notified that CallKit has deactivated the AVAudioSession.
+        sessionManager.core?.activateAudioSession(activated: false)
     }
 }

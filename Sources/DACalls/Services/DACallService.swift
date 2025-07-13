@@ -28,6 +28,9 @@ public class DACallService: NSObject {
     /// UUID for CallKit to identify the call
     @Published public private(set) var callUUID: UUID?
 
+    /// Whether Call is on hold
+    @Published public private(set) var isPaused: Bool = false
+
     /// Set the current call
     /// - Parameter call: The call to set as current
     public func setCurrentCall(_ call: DACall?) {
@@ -44,6 +47,12 @@ public class DACallService: NSObject {
     /// - Parameter isMuted: Whether the microphone is muted
     public func setMicMuted(_ isMuted: Bool) {
         isMicMuted = isMuted
+    }
+
+    /// Set  call isPaused or on Hold
+    /// - Parameter isPaused: Where the call is paused
+    public func setIsPaused(_ state: Bool) {
+        isPaused = state
     }
 
     /// Set the CallUUID
@@ -81,7 +90,7 @@ public class DACallService: NSObject {
 
         // You can customize these properties for your app
         providerConfiguration.iconTemplateImageData = nil // Replace with your app's call icon
-        providerConfiguration.ringtoneSound = "dialafrika_ringtone.wav" // Custom ringtone
+        providerConfiguration.ringtoneSound = "dialafrika-ringtone.mp3" // Custom ringtone
 
         provider = CXProvider(configuration: providerConfiguration)
         provider?.setDelegate(self, queue: nil)
@@ -108,6 +117,7 @@ public class DACallService: NSObject {
             let params = try core.createCallParams(call: nil)
             params.mediaEncryption = .None // You can set this to .SRTP for encrypted audio
             params.videoEnabled = false // Ensure video is disabled
+            params.audioEnabled = true
 
             // Start the call using CallKit
             let uuid = UUID()
@@ -201,6 +211,30 @@ public class DACallService: NSObject {
         core.micEnabled = !core.micEnabled
         isMicMuted = !core.micEnabled
         return isMicMuted
+    }
+
+    /// Toggle call paused state
+    /// - Returns: New paused state
+    @discardableResult
+    public func toggleCallHold() -> Bool {
+        guard let core = sessionManager.core, let call = core.currentCall else {
+            return false
+        }
+
+        do {
+            if isPaused {
+                try call.resume()
+                isPaused = !isPaused
+                return false
+            } else {
+                try call.pause()
+                isPaused = !isPaused
+                return true
+            }
+        } catch {
+            isPaused = false
+            return false
+        }
     }
 
     /// Toggle speaker state

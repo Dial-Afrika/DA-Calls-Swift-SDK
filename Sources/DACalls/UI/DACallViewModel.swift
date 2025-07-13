@@ -13,6 +13,7 @@ public class DACallViewModel: ObservableObject {
     @Published public var isCallActive: Bool = false
     @Published public var isMuted: Bool = false
     @Published public var isSpeakerOn: Bool = false
+    @Published public var isPaused: Bool = false
     @Published public var callEnded: Bool = false
     @Published public var showKeypad: Bool = false
 
@@ -97,6 +98,10 @@ public class DACallViewModel: ObservableObject {
                     self.callStatusText = "Resuming..."
                     self.isCallActive = true
 
+                case .startingViaCallKit:
+                    self.callStatusText = "Connecting..."
+                    self.isCallActive = false
+
                 case .ended:
                     self.callStatusText = "Call Ended"
                     self.isCallActive = false
@@ -123,6 +128,14 @@ public class DACallViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] speakerOn in
                 self?.isSpeakerOn = speakerOn
+            }
+            .store(in: &cancellables)
+
+        // Observe hold state
+        DACalls.shared.callService.$isPaused
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] onHold in
+                self?.isPaused = onHold
             }
             .store(in: &cancellables)
     }
@@ -166,6 +179,11 @@ public class DACallViewModel: ObservableObject {
     /// Toggle microphone mute state
     public func toggleMute() {
         isMuted = DACalls.shared.callService.toggleMicrophone()
+    }
+
+    /// Toggle microphone mute state
+    public func toggleHold() {
+        isMuted = DACalls.shared.callService.toggleCallHold()
     }
 
     /// Toggle speaker state

@@ -9,6 +9,86 @@
           "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
           "name" : "linphonesw"
         },
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/belr/belr.xcframework",
+        "source" : {
+          "checksum" : "3c7e14acfeb92db950dabaa8391d9b386507af5073f464b6a37baaf45b1c0991",
+          "type" : "remote",
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/belr.xcframework.zip"
+        },
+        "targetName" : "belr"
+      },
+      {
+        "kind" : "xcframework",
+        "packageRef" : {
+          "identity" : "linphone-sdk-swift-ios",
+          "kind" : "remoteSourceControl",
+          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
+          "name" : "linphonesw"
+        },
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/msamr/msamr.xcframework",
+        "source" : {
+          "checksum" : "16e52e18f4f74c040c8bd2e4747548fdd3146a2fc3e817f987684e740b8ec75b",
+          "type" : "remote",
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/msamr.xcframework.zip"
+        },
+        "targetName" : "msamr"
+      },
+      {
+        "kind" : "xcframework",
+        "packageRef" : {
+          "identity" : "linphone-sdk-swift-ios",
+          "kind" : "remoteSourceControl",
+          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
+          "name" : "linphonesw"
+        },
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/ortp/ortp.xcframework",
+        "source" : {
+          "checksum" : "43cdcbf1e95b16776af12ade3b17712d27c41e163f4ba8ba695075dae9f4b6e0",
+          "type" : "remote",
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/ortp.xcframework.zip"
+        },
+        "targetName" : "ortp"
+      },
+      {
+        "kind" : "xcframework",
+        "packageRef" : {
+          "identity" : "linphone-sdk-swift-ios",
+          "kind" : "remoteSourceControl",
+          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
+          "name" : "linphonesw"
+        },
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/bctoolbox-tester/bctoolbox-tester.xcframework",
+        "source" : {
+          "checksum" : "c400eecee3a2652abb2cb7855de047a8baba7aac1af1000508f196c1a4bdc1b6",
+          "type" : "remote",
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/bctoolbox-tester.xcframework.zip"
+        },
+        "targetName" : "bctoolbox-tester"
+      },
+      {
+        "kind" : "xcframework",
+        "packageRef" : {
+          "identity" : "linphone-sdk-swift-ios",
+          "kind" : "remoteSourceControl",
+          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
+          "name" : "linphonesw"
+        },
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/linphonetester/linphonetester.xcframework",
+        "source" : {
+          "checksum" : "062bf4066fce8b4540f33c268fe915f34a4e7ea61e9f0fb100afa42305ea408d",
+          "type" : "remote",
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/linphonetester.xcframework.zip"
+        },
+        "targetName" : "linphonetester"
+      },
+      {
+        "kind" : "xcframework",
+        "packageRef" : {
+          "identity" : "linphone-sdk-swift-ios",
+          "kind" : "remoteSourceControl",
+          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
+          "name" : "linphonesw"
+        },
         "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/bctoolbox/bctoolbox.xcframework",
         "source" : {
           "checksum" : "94bda78d19f9139a3d0ac505ded44dbee3a67ca4386889025aca17f64d53792b",
@@ -41,93 +121,13 @@
           "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
           "name" : "linphonesw"
         },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/mscodec2/mscodec2.xcframework",
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/mediastreamer2/mediastreamer2.xcframework",
         "source" : {
-          "checksum" : "e89d018ba679df3bbd874805d6b77cd909a2dca84794bab5e0292c119e192954",
+          "checksum" : "a483156197a0b7653a47995cad07bc60674c64bcba494a56aee275454e3b94d2",
           "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/mscodec2.xcframework.zip"
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/mediastreamer2.xcframework.zip"
         },
-        "targetName" : "mscodec2"
-      },
-      {
-        "kind" : "xcframework",
-        "packageRef" : {
-          "identity" : "linphone-sdk-swift-ios",
-          "kind" : "remoteSourceControl",
-          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
-          "name" : "linphonesw"
-        },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/linphone/linphone.xcframework",
-        "source" : {
-          "checksum" : "5928b4e8ea6d4a646ce1e10463086e7ce257bd32903aa01a7b93dcb8fe84d898",
-          "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/linphone.xcframework.zip"
-        },
-        "targetName" : "linphone"
-      },
-      {
-        "kind" : "xcframework",
-        "packageRef" : {
-          "identity" : "linphone-sdk-swift-ios",
-          "kind" : "remoteSourceControl",
-          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
-          "name" : "linphonesw"
-        },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/msamr/msamr.xcframework",
-        "source" : {
-          "checksum" : "16e52e18f4f74c040c8bd2e4747548fdd3146a2fc3e817f987684e740b8ec75b",
-          "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/msamr.xcframework.zip"
-        },
-        "targetName" : "msamr"
-      },
-      {
-        "kind" : "xcframework",
-        "packageRef" : {
-          "identity" : "linphone-sdk-swift-ios",
-          "kind" : "remoteSourceControl",
-          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
-          "name" : "linphonesw"
-        },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/mssilk/mssilk.xcframework",
-        "source" : {
-          "checksum" : "86aa8cfc7cd05953ff8bd26518fae9f983e889ca148be580cdd6288aa10a6709",
-          "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/mssilk.xcframework.zip"
-        },
-        "targetName" : "mssilk"
-      },
-      {
-        "kind" : "xcframework",
-        "packageRef" : {
-          "identity" : "linphone-sdk-swift-ios",
-          "kind" : "remoteSourceControl",
-          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
-          "name" : "linphonesw"
-        },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/belcard/belcard.xcframework",
-        "source" : {
-          "checksum" : "04df6f22bd1b75f086776855dccddbbeafebdc30a3287084f6359bf15a85c53d",
-          "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/belcard.xcframework.zip"
-        },
-        "targetName" : "belcard"
-      },
-      {
-        "kind" : "xcframework",
-        "packageRef" : {
-          "identity" : "linphone-sdk-swift-ios",
-          "kind" : "remoteSourceControl",
-          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
-          "name" : "linphonesw"
-        },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/msopenh264/msopenh264.xcframework",
-        "source" : {
-          "checksum" : "b23f02cbae1dd90f3d7cb700820a80c3ccde26743ca9291d77a76d1edad2987b",
-          "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/msopenh264.xcframework.zip"
-        },
-        "targetName" : "msopenh264"
+        "targetName" : "mediastreamer2"
       },
       {
         "kind" : "xcframework",
@@ -153,13 +153,45 @@
           "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
           "name" : "linphonesw"
         },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/lime/lime.xcframework",
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/linphone/linphone.xcframework",
         "source" : {
-          "checksum" : "0f52c9bfe92e2305640a2b596e80741751e6c1db15215ad2b21c843442803aab",
+          "checksum" : "5928b4e8ea6d4a646ce1e10463086e7ce257bd32903aa01a7b93dcb8fe84d898",
           "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/lime.xcframework.zip"
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/linphone.xcframework.zip"
         },
-        "targetName" : "lime"
+        "targetName" : "linphone"
+      },
+      {
+        "kind" : "xcframework",
+        "packageRef" : {
+          "identity" : "linphone-sdk-swift-ios",
+          "kind" : "remoteSourceControl",
+          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
+          "name" : "linphonesw"
+        },
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/mscodec2/mscodec2.xcframework",
+        "source" : {
+          "checksum" : "e89d018ba679df3bbd874805d6b77cd909a2dca84794bab5e0292c119e192954",
+          "type" : "remote",
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/mscodec2.xcframework.zip"
+        },
+        "targetName" : "mscodec2"
+      },
+      {
+        "kind" : "xcframework",
+        "packageRef" : {
+          "identity" : "linphone-sdk-swift-ios",
+          "kind" : "remoteSourceControl",
+          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
+          "name" : "linphonesw"
+        },
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/msopenh264/msopenh264.xcframework",
+        "source" : {
+          "checksum" : "b23f02cbae1dd90f3d7cb700820a80c3ccde26743ca9291d77a76d1edad2987b",
+          "type" : "remote",
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/msopenh264.xcframework.zip"
+        },
+        "targetName" : "msopenh264"
       },
       {
         "kind" : "xcframework",
@@ -185,13 +217,13 @@
           "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
           "name" : "linphonesw"
         },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/linphonetester/linphonetester.xcframework",
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/belcard/belcard.xcframework",
         "source" : {
-          "checksum" : "062bf4066fce8b4540f33c268fe915f34a4e7ea61e9f0fb100afa42305ea408d",
+          "checksum" : "04df6f22bd1b75f086776855dccddbbeafebdc30a3287084f6359bf15a85c53d",
           "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/linphonetester.xcframework.zip"
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/belcard.xcframework.zip"
         },
-        "targetName" : "linphonetester"
+        "targetName" : "belcard"
       },
       {
         "kind" : "xcframework",
@@ -201,13 +233,13 @@
           "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
           "name" : "linphonesw"
         },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/mediastreamer2/mediastreamer2.xcframework",
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/lime/lime.xcframework",
         "source" : {
-          "checksum" : "a483156197a0b7653a47995cad07bc60674c64bcba494a56aee275454e3b94d2",
+          "checksum" : "0f52c9bfe92e2305640a2b596e80741751e6c1db15215ad2b21c843442803aab",
           "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/mediastreamer2.xcframework.zip"
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/lime.xcframework.zip"
         },
-        "targetName" : "mediastreamer2"
+        "targetName" : "lime"
       },
       {
         "kind" : "xcframework",
@@ -217,45 +249,13 @@
           "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
           "name" : "linphonesw"
         },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/ortp/ortp.xcframework",
+        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/mssilk/mssilk.xcframework",
         "source" : {
-          "checksum" : "43cdcbf1e95b16776af12ade3b17712d27c41e163f4ba8ba695075dae9f4b6e0",
+          "checksum" : "86aa8cfc7cd05953ff8bd26518fae9f983e889ca148be580cdd6288aa10a6709",
           "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/ortp.xcframework.zip"
+          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/mssilk.xcframework.zip"
         },
-        "targetName" : "ortp"
-      },
-      {
-        "kind" : "xcframework",
-        "packageRef" : {
-          "identity" : "linphone-sdk-swift-ios",
-          "kind" : "remoteSourceControl",
-          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
-          "name" : "linphonesw"
-        },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/belr/belr.xcframework",
-        "source" : {
-          "checksum" : "3c7e14acfeb92db950dabaa8391d9b386507af5073f464b6a37baaf45b1c0991",
-          "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/belr.xcframework.zip"
-        },
-        "targetName" : "belr"
-      },
-      {
-        "kind" : "xcframework",
-        "packageRef" : {
-          "identity" : "linphone-sdk-swift-ios",
-          "kind" : "remoteSourceControl",
-          "location" : "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git",
-          "name" : "linphonesw"
-        },
-        "path" : "/Users/josephkangethe/Documents/dialafrika/sdk/sdk/DACalls/.build/artifacts/linphone-sdk-swift-ios/bctoolbox-tester/bctoolbox-tester.xcframework",
-        "source" : {
-          "checksum" : "c400eecee3a2652abb2cb7855de047a8baba7aac1af1000508f196c1a4bdc1b6",
-          "type" : "remote",
-          "url" : "https://download.linphone.org/releases/ios//spm//linphone-sdk-swift-ios-5.4.24/XCFrameworks/bctoolbox-tester.xcframework.zip"
-        },
-        "targetName" : "bctoolbox-tester"
+        "targetName" : "mssilk"
       }
     ],
     "dependencies" : [

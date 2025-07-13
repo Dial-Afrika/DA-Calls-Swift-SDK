@@ -16,8 +16,8 @@ struct DACallsExampleApp: App {
 struct ContentView: View {
     @State private var showLoginView = false
     @State private var showDialView = false
-    @State private var showCallView = false
-    @State private var isLoggedIn = false
+    @State private var showCallView = true
+    @State private var isLoggedIn = true
 
     var body: some View {
         NavigationView {

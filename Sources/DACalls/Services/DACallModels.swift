@@ -70,6 +70,9 @@ public enum DACallState {
     /// Call has ended
     case ended
 
+    /// CallKit Starter
+    case startingViaCallKit
+
     /// Call failed with error
     case error(String)
 }
