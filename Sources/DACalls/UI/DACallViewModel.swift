@@ -16,6 +16,11 @@ public class DACallViewModel: ObservableObject {
     @Published public var isPaused: Bool = false
     @Published public var callEnded: Bool = false
     @Published public var showKeypad: Bool = false
+    @Published public var client: DACallClient = .init(
+        name: "Unknown",
+        phoneNumber: "0000 000 000",
+        remoteAddress: "xxxx"
+    )
 
     private var cancellables = Set<AnyCancellable>()
     private var durationTimer: Timer?
@@ -23,6 +28,11 @@ public class DACallViewModel: ObservableObject {
 
     public init() {
         setupObservers()
+        client = client
+    }
+
+    public func setClient(client: DACallClient) {
+        self.client = client
     }
 
     deinit {
@@ -90,6 +100,10 @@ public class DACallViewModel: ObservableObject {
                     self.callStatusText = "On Hold"
                     self.isCallActive = true
 
+                case .pausing:
+                    self.callStatusText = "Putting call on hold..."
+                    self.isCallActive = true
+
                 case .pausedByRemote:
                     self.callStatusText = "On Hold by Remote"
                     self.isCallActive = true
@@ -145,14 +159,20 @@ public class DACallViewModel: ObservableObject {
         stopTimer()
         callStartTime = Date()
 
-        durationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        durationTimer = Timer.scheduledTimer(
+            withTimeInterval: 1.0, repeats: true
+        ) { [weak self] _ in
             Task { @MainActor in
-                guard let self = self, let startTime = self.callStartTime else { return }
+                guard let self = self, let startTime = self.callStartTime else {
+                    return
+                }
 
                 let duration = Int(Date().timeIntervalSince(startTime))
                 let minutes = duration / 60
                 let seconds = duration % 60
-                self.callDuration = String(format: "%02d:%02d", minutes, seconds)
+                self.callDuration = String(
+                    format: "%02d:%02d", minutes, seconds
+                )
             }
         }
     }
@@ -183,7 +203,8 @@ public class DACallViewModel: ObservableObject {
 
     /// Toggle microphone mute state
     public func toggleHold() {
-        isMuted = DACalls.shared.callService.toggleCallHold()
+        isMuted = DACalls.shared.callService.toggleCallHold(
+            targetRemote: remoteParty)
     }
 
     /// Toggle speaker state

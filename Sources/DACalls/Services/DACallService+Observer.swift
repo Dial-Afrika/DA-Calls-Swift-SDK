@@ -8,7 +8,6 @@ extension DACallService: @preconcurrency DASessionStateObserver {
         if case let .call(callEvent) = event {
             switch callEvent {
             case let .incoming(_, from):
-                // Report incoming call to CallKit if we have a core call
                 if let core = sessionManager.core, let call = core.currentCall {
                     reportIncomingCall(call: call, fromAddress: from)
                 }
@@ -36,10 +35,10 @@ extension DACallService: @preconcurrency DASessionStateObserver {
 
             case let .terminated(_, reason):
                 // Check if this is a call failure or normal termination
-                if reason.lowercased().contains("failed") ||
-                    reason.lowercased().contains("error") ||
-                    reason.lowercased().contains("declined") ||
-                    reason.lowercased().contains("rejected")
+                if reason.lowercased().contains("failed")
+                    || reason.lowercased().contains("error")
+                    || reason.lowercased().contains("declined")
+                    || reason.lowercased().contains("rejected")
                 {
                     // Handle call failure
                     setCallState(.error("Call failed: \(reason)"))

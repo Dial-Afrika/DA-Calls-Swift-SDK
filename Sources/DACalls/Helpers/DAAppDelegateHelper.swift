@@ -16,7 +16,7 @@ public struct DAAppDelegateHelper {
     ) async -> Bool {
         // Initialize DACalls SDK with default configuration
         let config = DAConfig()
-        await DACalls.shared.initialize(with: config)
+        await DACalls.shared.initialize(config: DAConfig(), client: DACallClient())
 
         // Handle any push notification in the launch options
         if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {

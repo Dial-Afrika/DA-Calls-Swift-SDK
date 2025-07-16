@@ -19,6 +19,11 @@ public class DASessionManager {
     /// Configuration used for this session
     public var config: DAConfig = .init()
 
+    /// Call Client
+    @Published public private(set) var client: DACallClient = .init(
+        name: "", phoneNumber: "", remoteAddress: ""
+    )
+
     /// Initialize a new DASessionManager
     init() {
         core?.disableChat(denyReason: .None)
@@ -113,8 +118,8 @@ public class DASessionManager {
                 let callId = String(call.callLog?.callId ?? "")
                 switch state {
                 case .IncomingReceived, .PushIncomingReceived:
-                    let remoteAddress = call.remoteAddress?.asStringUriOnly() ?? "Unknown"
-                    self.notifyObservers(event: .call(.incoming(callId: callId, from: remoteAddress)))
+                    let remoteAddress = !client.name.isEmpty ? client.name : (call.remoteAddress?.asStringUriOnly() != nil) ? call.remoteAddress!.asStringUriOnly() : "Unknown"
+                    self.notifyObservers(event: .call(.incoming(callId: callId, from: client.name)))
 
                 case .OutgoingInit:
                     self.notifyObservers(event: .call(.outgoingInit(callId: callId)))

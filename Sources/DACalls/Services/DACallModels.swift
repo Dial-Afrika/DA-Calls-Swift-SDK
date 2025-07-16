@@ -12,6 +12,9 @@ public struct DACall {
     /// Direction of the call
     public let direction: DACallDirection
 
+    /// Call Client
+    public let client: DACallClient
+
     /// Call duration in seconds (computed property)
     public var duration: Int {
         guard let core = DACalls.shared.sessionManager.core,
@@ -61,6 +64,9 @@ public enum DACallState {
     /// Call is paused by local user
     case paused
 
+    /// Call is paused by local user
+    case pausing
+
     /// Call is paused by remote user
     case pausedByRemote
 
@@ -84,4 +90,37 @@ public enum DACallError: Error {
 
     /// Call failed with message
     case callFailed(String)
+}
+
+/// Call client details
+public struct DACallClient {
+    /// Name
+    public let name: String
+
+    /// Client Phone Number
+    public let phoneNumber: String
+
+    /// Remote address (SIP URI or phone number)
+    public let remoteAddress: String
+
+    /// Client avatar if available
+    public let avatar: String?
+
+    public init(
+        name: String = "", phoneNumber: String = "", remoteAddress: String = "", with avatar: String = ""
+    ) {
+        self.name = name
+        self.phoneNumber = phoneNumber
+        self.remoteAddress = remoteAddress
+        self.avatar = avatar
+    }
+}
+
+/// Call Options enum
+public enum CallOptions: Hashable {
+    /// Call client via VoIP
+    case callInApp
+
+    /// Push call to the Phone App
+    case callByPhone
 }

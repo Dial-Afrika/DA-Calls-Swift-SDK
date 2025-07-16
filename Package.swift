@@ -14,7 +14,6 @@ let package = Package(
         ),
     ],
     dependencies: [
-        //        .package(url: "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git", branch: "novideo/stable")
         .package(url: "https://gitlab.linphone.org/BC/public/linphone-sdk-swift-ios.git", from: "5.4.0"),
     ],
     targets: [

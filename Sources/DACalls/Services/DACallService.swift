@@ -1,8 +1,10 @@
 import AVFoundation
 import CallKit
-import Combine
+
+// import Combine
 import Foundation
 import linphonesw
+import UIKit
 
 /// Service for managing voice calls with CallKit integration
 @MainActor
@@ -30,6 +32,14 @@ public class DACallService: NSObject {
 
     /// Whether Call is on hold
     @Published public private(set) var isPaused: Bool = false
+
+    /// Call Kit App Logo
+    @Published public private(set) var logo: Data = .init()
+
+    /// Call Client
+    @Published public private(set) var client: DACallClient = .init(
+        name: "", phoneNumber: "", remoteAddress: ""
+    )
 
     /// Set the current call
     /// - Parameter call: The call to set as current
@@ -67,6 +77,22 @@ public class DACallService: NSObject {
         isSpeakerEnabled = isEnabled
     }
 
+    /// Set the Sevice Client
+    /// - Parameter client: service client
+    public func setClient(client: DACallClient) {
+        self.client = client
+    }
+
+    /// Set the Sevice Client
+    /// - Parameter client: service client
+    public func setLogo(logo: String) {
+        if let uiImage = UIImage(named: logo),
+           let data = uiImage.pngData()
+        {
+            self.logo = data
+        }
+    }
+
     /// Initialize the call service
     /// - Parameter sessionManager: The core session manager
     init(sessionManager: DASessionManager) {
@@ -83,14 +109,14 @@ public class DACallService: NSObject {
     /// Set up the CallKit provider with configuration
     private func setupCallKitProvider() {
         let providerConfiguration = CXProviderConfiguration()
-        providerConfiguration.supportsVideo = false // Audio only
-        providerConfiguration.supportedHandleTypes = [.generic, .phoneNumber, .emailAddress]
+        providerConfiguration.supportsVideo = false
+        providerConfiguration.supportedHandleTypes = [
+            .generic, .phoneNumber, .emailAddress,
+        ]
         providerConfiguration.maximumCallsPerCallGroup = 1
         providerConfiguration.maximumCallGroups = 1
 
-        // You can customize these properties for your app
-        providerConfiguration.iconTemplateImageData = nil // Replace with your app's call icon
-        providerConfiguration.ringtoneSound = "dialafrika-ringtone.mp3" // Custom ringtone
+        providerConfiguration.iconTemplateImageData = logo
 
         provider = CXProvider(configuration: providerConfiguration)
         provider?.setDelegate(self, queue: nil)
@@ -98,6 +124,8 @@ public class DACallService: NSObject {
 
     /// The core session manager
     public let sessionManager: DASessionManager
+
+    // MARK: Make Call
 
     /// Make an outgoing call
     /// - Parameter address: The SIP address to call
@@ -112,32 +140,36 @@ public class DACallService: NSObject {
             // Create the remote address
             let addr = "sip:\(address)@\(sessionManager.config.domain)"
             let remoteAddress = try Factory.Instance.createAddress(addr: addr)
-
+            try remoteAddress.setDisplayname(newValue: client.name)
             // Create call params
             let params = try core.createCallParams(call: nil)
-            params.mediaEncryption = .None // You can set this to .SRTP for encrypted audio
-            params.videoEnabled = false // Ensure video is disabled
+            params.mediaEncryption = .None
+            params.videoEnabled = false
             params.audioEnabled = true
 
-            // Start the call using CallKit
+            // CallKit
             let uuid = UUID()
             callUUID = uuid
+            let handle = CXHandle(
+                type: .generic,
+                value: client.name ?? "Unknown"
+            )
 
-            let handle = CXHandle(type: .generic, value: remoteAddress.asStringUriOnly())
             let startCallAction = CXStartCallAction(call: uuid, handle: handle)
 
             let transaction = CXTransaction(action: startCallAction)
             try await callController.request(transaction)
 
-            // Now make the actual call with liblinphone
-            // The core will connect this to the CallKit call
-            let call = core.inviteAddressWithParams(addr: remoteAddress, params: params)
+            let call = core.inviteAddressWithParams(
+                addr: remoteAddress, params: params
+            )
 
             // Update state
             let daCall = DACall(
                 callId: call?.callLog?.callId ?? "",
                 remoteAddress: remoteAddress.asStringUriOnly(),
-                direction: .outgoing
+                direction: .outgoing,
+                client: client
             )
 
             currentCall = daCall
@@ -216,23 +248,47 @@ public class DACallService: NSObject {
     /// Toggle call paused state
     /// - Returns: New paused state
     @discardableResult
-    public func toggleCallHold() -> Bool {
-        guard let core = sessionManager.core, let call = core.currentCall else {
+    public func toggleCallHold(targetRemote: String? = nil) -> Bool {
+        guard let core = sessionManager.core else {
+            return false
+        }
+
+        let calls = core.calls
+
+        // 1️⃣ If any call is active, pause it
+        if let active = calls.first(where: { $0.state == .StreamsRunning }) {
+            do {
+                try active.pause()
+                isPaused = true
+                return true
+            } catch {
+                return false
+            }
+        }
+
+        // 2️⃣ Look for a paused call to resume
+        let pausedCalls = calls.filter { $0.state == .Paused }
+
+        // 3️⃣ Choose the correct paused call
+        let callToResume: Call?
+        if let remote = targetRemote {
+            callToResume = pausedCalls.first {
+                $0.remoteAddress?.asString() == remote
+            }
+        } else {
+            callToResume = pausedCalls.first
+        }
+
+        guard let call = callToResume else {
             return false
         }
 
         do {
-            if isPaused {
-                try call.resume()
-                isPaused = !isPaused
-                return false
-            } else {
-                try call.pause()
-                isPaused = !isPaused
-                return true
-            }
-        } catch {
+            try call.resume()
             isPaused = false
+            return true
+        } catch {
+            print("Error resuming call:", error)
             return false
         }
     }
@@ -282,33 +338,46 @@ public class DACallService: NSObject {
         }
     }
 
+    // MARK: Report Incoming Call
+
     /// Report an incoming call to CallKit
     /// - Parameters:
     ///   - call: The incoming call
     ///   - fromAddress: The caller's address
-    public func reportIncomingCall(call: Call, fromAddress: String) {
+    public func reportIncomingCall(call: Call, fromAddress _: String) {
         let uuid = UUID()
         callUUID = uuid
 
         let update = CXCallUpdate()
-        update.remoteHandle = CXHandle(type: .generic, value: fromAddress)
+        update.remoteHandle = CXHandle(
+            type: .generic,
+            value: call.remoteAddress?.displayName ?? call.remoteAddress?
+                .username ?? "Unknown"
+        )
         update.hasVideo = false
         update.supportsDTMF = true
         update.supportsHolding = true
         update.supportsGrouping = false
         update.supportsUngrouping = false
+        update.localizedCallerName =
+            call.remoteAddress?.displayName?.capitalized ?? call.remoteAddress?.username?.capitalized
+                ?? "Unknown"
 
         provider?.reportNewIncomingCall(with: uuid, update: update) { error in
             if let error = error {
-                print("Failed to report incoming call: \(error.localizedDescription)")
+                print(
+                    "Failed to report incoming call: \(error.localizedDescription)"
+                )
             }
         }
 
         // Create and update current call
         let daCall = DACall(
             callId: call.callLog?.callId ?? "",
-            remoteAddress: fromAddress,
-            direction: .incoming
+            remoteAddress: call.remoteAddress?.displayName ?? call
+                .remoteAddress?.username ?? "Unknown",
+            direction: .incoming,
+            client: client
         )
 
         currentCall = daCall
@@ -323,7 +392,8 @@ public class DACallService: NSObject {
 
         callController.request(transaction) { error in
             if let error = error {
-                print("Failed to end CallKit call: \(error.localizedDescription)")
+                print(
+                    "Failed to end CallKit call: \(error.localizedDescription)")
             }
         }
     }

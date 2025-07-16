@@ -28,8 +28,6 @@ public struct DADialPadView: View {
                 }
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
     }
 }
 
