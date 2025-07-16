@@ -152,7 +152,7 @@ public class DACallService: NSObject {
             callUUID = uuid
             let handle = CXHandle(
                 type: .generic,
-                value: client.name ?? "Unknown"
+                value: remoteAddress.username ?? "Unknown"
             )
 
             let startCallAction = CXStartCallAction(call: uuid, handle: handle)
