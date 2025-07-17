@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:6.0
 // DACalls - Swift package for VoIP call handling
 import PackageDescription
 
