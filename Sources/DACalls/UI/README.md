@@ -20,10 +20,6 @@ A reusable dial pad component that displays a standard telephone keypad and prov
 
 A view for initiating outgoing calls. It includes a text field for entering the destination address and a dial pad for entering numbers.
 
-### DALoginView
-
-A view for authenticating with a SIP server. It includes fields for username, password, domain, and transport type.
-
 ### DACallScreen
 
 An all-in-one VoIP call screen that includes login, dialpad, and call management functionality.
@@ -36,7 +32,7 @@ These components can be used individually or together depending on your app's ne
 // Using the dial view
 struct ContentView: View {
     @State private var showCallView = false
-    
+
     var body: some View {
         DADialView(onCallStarted: {
             showCallView = true
@@ -52,7 +48,7 @@ struct ContentView: View {
 // Using the all-in-one call screen
 struct ContentView: View {
     @State private var showCallScreen = false
-    
+
     var body: some View {
         Button("Start Call") {
             showCallScreen = true

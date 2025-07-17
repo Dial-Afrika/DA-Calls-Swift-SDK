@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "DACalls",
     platforms: [
-        .iOS(.v14),
+        .iOS(.v16),
     ],
     products: [
         .library(

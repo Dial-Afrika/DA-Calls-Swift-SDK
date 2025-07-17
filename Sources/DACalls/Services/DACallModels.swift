@@ -104,10 +104,10 @@ public struct DACallClient {
     public let remoteAddress: String
 
     /// Client avatar if available
-    public let avatar: String?
+    public let avatar: URL?
 
     public init(
-        name: String = "", phoneNumber: String = "", remoteAddress: String = "", with avatar: String = ""
+        name: String = "", phoneNumber: String = "", remoteAddress: String = "", with avatar: URL = URL(fileURLWithPath: "")
     ) {
         self.name = name
         self.phoneNumber = phoneNumber

@@ -2,189 +2,363 @@ import Combine
 import Foundation
 import SwiftUI
 
-/// View for managing active calls
+// MARK: DA Call View
+
 public struct DACallView: View {
     @StateObject private var viewModel = DACallViewModel()
+    var client: DACallClient
+    @Environment(\.dismiss) private var dismiss
 
-    /// Called when a call ends and the view should be dismissed
-    public var onCallEnded: (() -> Void)?
-
-    /// Public initializer
-    public init(onCallEnded: (() -> Void)? = nil) {
-        self.onCallEnded = onCallEnded
+    public init(client: DACallClient) {
+        self.client = client
     }
 
     public var body: some View {
-        VStack(spacing: 30) {
-            // Call status and remote identity
-            VStack(spacing: 10) {
-                Text(viewModel.callStatusText)
-                    .font(.headline)
-                    .foregroundColor(.secondary)
+        NavigationView {
+            ZStack {
+                // Background gradient
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(.systemGray6).opacity(0.3),
+                        Color(.systemGray5).opacity(0.5),
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
 
-                Text(viewModel.remoteParty)
-                    .font(.largeTitle)
-                    .bold()
-
-                if viewModel.isCallActive {
-                    Text(viewModel.callDuration)
-                        .font(.title3)
-                }
-            }
-            .padding()
-
-            Spacer()
-
-            // Call controls
-            if viewModel.isIncomingCall {
-                // Incoming call controls
-                HStack(spacing: 40) {
-                    // Decline button
-                    Button(action: {
-                        Task {
-                            await viewModel.endCall()
-                        }
-                    }) {
-                        VStack {
+                VStack(spacing: 30) {
+                    Spacer()
+                    // Call Info Card
+                    VStack(spacing: 20) {
+                        // Contact Avatar
+                        ZStack {
                             Circle()
-                                .fill(Color.red)
-                                .frame(width: 64, height: 64)
-                                .overlay(
-                                    Image(systemName: "phone.down.fill")
-                                        .font(.system(size: 28))
-                                        .foregroundColor(.white)
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            .gray.opacity(0.5),
+                                            .gray.opacity(0.2),
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
+                                .frame(width: 180, height: 120)
 
-                            Text("Decline")
-                                .font(.caption)
-                                .padding(.top, 5)
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 50))
+                                .foregroundColor(
+                                    viewModel.isCallActive
+                                        ? Color.green
+                                        : viewModel.isPaused
+                                        ? Color.orange : Color.blue)
+                        }
+
+                        VStack(spacing: 8) {
+                            Text(
+                                client.name.isEmpty
+                                    ? "Unknown" : client.name
+                            )
+                            .font(.title)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.center)
+
+                            Text(viewModel.callStatusText)
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                                .fontWeight(.medium)
+
+                            if viewModel.isCallActive {
+                                Text(viewModel.callDuration)
+                                    .font(.title2)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                    .padding(.top, 4)
+                            }
+                        }
+                    }
+                    .padding(30)
+
+                    Spacer()
+
+                    // Call Controls
+                    if viewModel.isCallActive {
+                        VStack(spacing: 20) {
+                            // Mute and Speaker buttons
+                            if !viewModel.showKeypad {
+                                HStack(spacing: 50) {
+                                    ControlButton(
+                                        icon: viewModel.isMuted
+                                            ? "mic.slash.fill" : "mic.fill",
+                                        isActive: viewModel.isMuted,
+                                        color: .red
+                                    ) {
+                                        viewModel.toggleMute()
+                                    }
+
+                                    ControlButton(
+                                        icon: viewModel.isSpeakerOn
+                                            ? "speaker.wave.3.fill"
+                                            : "speaker.fill",
+                                        isActive: viewModel.isSpeakerOn,
+                                        color: .blue
+                                    ) {
+                                        viewModel.toggleSpeaker()
+                                    }
+                                }
+                                HStack(spacing: 50) {
+                                    ControlButton(
+                                        icon: viewModel.isPaused
+                                            ? "play.fill" : "pause.fill",
+                                        isActive: viewModel.isPaused,
+                                        color: viewModel.isPaused
+                                            ? Color.orange : Color.gray
+                                    ) {
+                                        viewModel.toggleHold()
+                                    }
+
+                                    ControlButton(
+                                        icon: "square.grid.3x3.fill",
+                                        isActive: viewModel.showKeypad,
+                                        color: Color.gray
+                                    ) {
+                                        viewModel.showKeypad.toggle()
+                                    }
+                                }
+                            }
+
+                            // Dial pad (if shown)
+                            if viewModel.showKeypad {
+                                DADialPadView { digit in
+                                    viewModel.sendDTMF(digit: digit)
+                                }
+                                .frame(maxWidth: 280)
+                                .padding()
+                            }
                         }
                     }
 
-                    // Accept button
-                    Button(action: {
-                        Task {
-                            await viewModel.answerCall()
-                        }
-                    }) {
-                        VStack {
-                            Circle()
-                                .fill(Color.green)
-                                .frame(width: 64, height: 64)
-                                .overlay(
-                                    Image(systemName: "phone.fill")
-                                        .font(.system(size: 28))
-                                        .foregroundColor(.white)
-                                )
-
-                            Text("Answer")
-                                .font(.caption)
-                                .padding(.top, 5)
-                        }
-                    }
-                }
-            } else if viewModel.isCallActive {
-                // Active call controls
-                VStack(spacing: 20) {
+                    // Action Buttons
                     HStack(spacing: 30) {
-                        // Mute button
-                        Button(action: {
-                            viewModel.toggleMute()
-                        }) {
-                            VStack {
-                                Circle()
-                                    .fill(viewModel.isMuted ? Color.blue : Color.gray.opacity(0.3))
-                                    .frame(width: 56, height: 56)
-                                    .overlay(
-                                        Image(systemName: viewModel.isMuted ? "mic.slash.fill" : "mic.fill")
-                                            .font(.system(size: 24))
-                                            .foregroundColor(viewModel.isMuted ? .white : .gray)
-                                    )
-
-                                Text("Mute")
-                                    .font(.caption)
-                                    .padding(.top, 5)
+                        if viewModel.isIncomingCall && !viewModel.isCallActive {
+                            ActionButton(
+                                icon: "phone.fill",
+                                title: "Answer",
+                                color: .green
+                            ) {
+                                Task {
+                                    await viewModel.answerCall()
+                                }
                             }
                         }
 
-                        // Speaker button
-                        Button(action: {
-                            viewModel.toggleSpeaker()
-                        }) {
-                            VStack {
-                                Circle()
-                                    .fill(viewModel.isSpeakerOn ? Color.blue : Color.gray.opacity(0.3))
-                                    .frame(width: 56, height: 56)
-                                    .overlay(
-                                        Image(systemName: "speaker.wave.3.fill")
-                                            .font(.system(size: 24))
-                                            .foregroundColor(viewModel.isSpeakerOn ? .white : .gray)
-                                    )
-
-                                Text("Speaker")
-                                    .font(.caption)
-                                    .padding(.top, 5)
+                        if viewModel.showKeypad {
+                            ActionButton(
+                                icon: "xmark",
+                                title: "Hide Keypad",
+                                color: .red
+                            ) {
+                                Task {
+                                    viewModel.showKeypad.toggle()
+                                }
                             }
-                        }
-
-                        // Keypad button
-                        Button(action: {
-                            viewModel.showKeypad.toggle()
-                        }) {
-                            VStack {
-                                Circle()
-                                    .fill(viewModel.showKeypad ? Color.blue : Color.gray.opacity(0.3))
-                                    .frame(width: 56, height: 56)
-                                    .overlay(
-                                        Image(systemName: "dial.fill")
-                                            .font(.system(size: 24))
-                                            .foregroundColor(viewModel.showKeypad ? .white : .gray)
-                                    )
-
-                                Text("Keypad")
-                                    .font(.caption)
-                                    .padding(.top, 5)
+                        } else {
+                            ActionButton(
+                                icon: "phone.down.fill",
+                                title: "End Call",
+                                color: .red
+                            ) {
+                                Task {
+                                    await viewModel.endCall()
+                                }
                             }
                         }
                     }
 
-                    // Show keypad if enabled
-                    if viewModel.showKeypad {
-                        DADialPadView(onDigitPressed: { digit in
-                            viewModel.sendDTMF(digit: digit)
-                        })
-                        .transition(.opacity)
+                    HStack {
+                        Text(verbatim: "Powered by Bonga")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
                     }
+                    Spacer()
                 }
+                .padding(.horizontal, 10)
             }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .moveDisabled(true)
+            .padding(.horizontal)
+            //            .tabViewSidebarBottomBar {
+            //                Text(verbatim: "Powered by Bonga")
+            //            }
+        }
+    }
+}
 
-            Spacer()
+// Helper Views for better organization
+struct ControlButton: View {
+    let icon: String
+    let isActive: Bool
+    let color: Color
+    let action: () -> Void
 
-            // End call button (always visible for ongoing calls)
-            if viewModel.isCallActive || viewModel.isOutgoingCall {
-                Button(action: {
-                    Task {
-                        await viewModel.endCall()
-                    }
-                }) {
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.title)
+                .foregroundColor(isActive ? .white : color)
+                .frame(width: 70, height: 70)
+                .background(
                     Circle()
-                        .fill(Color.red)
-                        .frame(width: 64, height: 64)
-                        .overlay(
-                            Image(systemName: "phone.down.fill")
-                                .font(.system(size: 28))
-                                .foregroundColor(.white)
-                        )
-                }
-                .padding(.bottom, 30)
+                        .fill(isActive ? color : Color(.systemGray5))
+                )
+        }
+    }
+}
+
+struct ActionButton: View {
+    let icon: String
+    let title: String
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(.primary)
+                    .frame(width: 70, height: 70)
+                    .background(
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        color, color.opacity(0.8),
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .shadow(
+                                color: color.opacity(0.3), radius: 10, x: 0,
+                                y: 5
+                            )
+                    )
+
+                Text(title)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
             }
         }
-        .padding()
-        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
-        .onReceive(viewModel.$callEnded) { ended in
-            if ended {
-                onCallEnded?()
+    }
+}
+
+public struct DACallButton: View {
+    var client: DACallClient
+    var callViewModel = DACallViewModel()
+    let onInAppCall: () -> Void
+
+    @State private var showOptions = false
+//    @State private var sdkStatus = "Not Initialized"
+
+    public init(
+        client: DACallClient,
+        onInAppCall: @escaping () -> Void, showOptions _: Bool = false
+    ) {
+        self.client = client
+        self.onInAppCall = onInAppCall
+    }
+
+    public var body: some View {
+        NavigationStack {
+            Button(action: {
+                showOptions = true
+            }) {
+                HStack {
+                    Image(systemName: "phone.fill")
+                        .font(.system(size: 20, weight: .bold))
+                    Text("Call \(client.name)")
+                        .fontWeight(.semibold)
+                }
+                .foregroundStyle(.white)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.accentColor)
+                .cornerRadius(12)
+                .shadow(
+                    color: Color.accentColor.opacity(0.3), radius: 8, x: 0, y: 4
+                )
             }
+            .padding(.horizontal, 24)
+            .confirmationDialog(
+                "Call Options", isPresented: $showOptions,
+                titleVisibility: .visible
+            ) {
+                Button {
+                    makeCall()
+                    onInAppCall()
+                } label: {
+                    HStack {
+                        Image(systemName: "phone.fill")
+                            .font(.title2)
+                            .foregroundColor(.primary)
+                        Text("Call in-app")
+                            .font(.title2)
+                            .foregroundColor(.primary)
+                    }
+                    .frame(alignment: .leading)
+                }
+                .padding()
+                Divider()
+                Button {
+                    initiatePhoneCall()
+                } label: {
+                    HStack {
+                        Image(systemName: "phone.arrow.up.right")
+                            .font(.title2)
+                            .foregroundColor(.primary)
+                        Text("Call by phone")
+                            .font(.title2)
+                            .foregroundColor(.primary)
+                        Spacer()
+                    }
+                    .frame(alignment: .leading)
+                }
+                .padding()
+                Button("Cancel", role: .cancel) {}
+            }
+        }
+        .background(.clear)
+    }
+
+    private func makeCall() {
+        let addr = client.remoteAddress
+        Task {
+            let result = await DACalls.shared.callService.makeCall(
+                to: addr)
+            switch result {
+            case .success:
+                print(
+                    "Call initiated: \(client.name)"
+                )
+            case let .failure(error):
+                print("Call failed: \(error)")
+            }
+        }
+    }
+
+    private func initiatePhoneCall() {
+        if let url = URL(string: "tel://\(client.phoneNumber)"),
+           UIApplication.shared.canOpenURL(url)
+        {
+            UIApplication.shared.open(url)
+        } else {
+            print("Cannot initiate call to \(client.phoneNumber)")
         }
     }
 }

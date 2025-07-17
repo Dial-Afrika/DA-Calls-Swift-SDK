@@ -49,13 +49,10 @@ public struct DADialView: View {
 
     /// Make an outgoing call
     private func makeCall() {
-        // Format the SIP address if needed
         var address = destinationNumber
         if !address.contains("sip:") && !address.contains("@") {
-            // Assume this is a phone number, format accordingly
             address = "sip:\(address)@\(DACalls.shared.authService.currentDomain)"
         } else if !address.contains("sip:") {
-            // Address has @ but no sip: prefix
             address = "sip:\(address)"
         }
 
