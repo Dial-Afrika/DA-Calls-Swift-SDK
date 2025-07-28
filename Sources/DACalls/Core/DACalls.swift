@@ -59,10 +59,16 @@ public class DACalls {
                 }
             } else {
                 if let settingsURL = URL(
-                    string: UIApplication.openSettingsURLString),
-                    UIApplication.shared.canOpenURL(settingsURL)
+                    string: UIApplication.openSettingsURLString)
                 {
-                    await UIApplication.shared.open(settingsURL)
+                    Task { @MainActor in
+                        if await UIApplication.shared.canOpenURL(settingsURL) {
+                            // Using empty options dictionary which is Sendable
+                            await UIApplication.shared.open(
+                                settingsURL, options: [:]
+                            )
+                        }
+                    }
                 }
             }
         }

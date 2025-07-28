@@ -222,7 +222,7 @@ extension DAAuthService: @preconcurrency DASessionStateObserver {
 }
 
 /// Registration state for SIP accounts
-public enum DARegistrationState: Equatable {
+public enum DARegistrationState: Equatable, Sendable {
     /// No registration attempt
     case none
 

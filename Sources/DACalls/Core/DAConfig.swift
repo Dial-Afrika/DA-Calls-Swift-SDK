@@ -1,7 +1,7 @@
 import Foundation
 
 /// Configuration for initializing the DACalls SDK
-public struct DAConfig {
+public struct DAConfig: Sendable {
     /// Debug level for logging
     public let debugLevel: DALogLevel
 
@@ -40,7 +40,7 @@ public struct DAConfig {
 }
 
 /// Log levels for the SDK
-public enum DALogLevel {
+public enum DALogLevel: Sendable {
     /// Debug level logging (most verbose)
     case debug
     /// Info level logging
@@ -54,7 +54,7 @@ public enum DALogLevel {
 }
 
 /// Push notification configuration
-public struct DAPushConfig {
+public struct DAPushConfig: Sendable {
     /// Whether push notifications are enabled
     public let enabled: Bool
 

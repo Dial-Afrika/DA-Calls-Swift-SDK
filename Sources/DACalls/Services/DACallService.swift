@@ -106,6 +106,12 @@ public class DACallService: NSObject {
         setupCallKitProvider()
     }
 
+    CallRequestQueue {
+        func enqueue(_ operation: @escaping () async throws -> Void) async rethrows {
+            try await operation()
+        }
+    }
+
     /// Set up the CallKit provider with configuration
     private func setupCallKitProvider() {
         let providerConfiguration = CXProviderConfiguration()
@@ -158,7 +164,7 @@ public class DACallService: NSObject {
             let startCallAction = CXStartCallAction(call: uuid, handle: handle)
 
             let transaction = CXTransaction(action: startCallAction)
-            try await callController.request(transaction)
+            try await requestCallTransaction(transaction)
 
             let call = core.inviteAddressWithParams(
                 addr: remoteAddress, params: params
@@ -207,28 +213,65 @@ public class DACallService: NSObject {
 
     /// End the current call
     /// - Returns: Result indicating success or failure
+//    @discardableResult
+//    public func endCall() async -> Result<Void, DAError> {
+//        guard let core = sessionManager.core else {
+//            return .failure(.notInitialized)
+//        }
+//
+//        do {
+//            if let callUUID = callUUID {
+//                // End call via CallKit
+//                let endCallAction = CXEndCallAction(call: callUUID)
+//                let transaction = CXTransaction(action: endCallAction)
+//                try await requestCallTransaction(transaction)
+//            }
+//
+//            // Also terminate the call in the core
+//            if let call = core.currentCall {
+//                try call.terminate()
+//            }
+//
+//            return .success(())
+//        } catch {
+//            return .failure(.callFailed(error.localizedDescription))
+//        }
+//    }
+
+    // Inside your DACallService
+    let callQueue = CallRequestQueue()
+
     @discardableResult
     public func endCall() async -> Result<Void, DAError> {
         guard let core = sessionManager.core else {
             return .failure(.notInitialized)
         }
 
-        do {
-            if let callUUID = callUUID {
-                // End call via CallKit
-                let endCallAction = CXEndCallAction(call: callUUID)
-                let transaction = CXTransaction(action: endCallAction)
-                try await callController.request(transaction)
-            }
+        return await withCheckedContinuation { continuation in
+            Task {
+                do {
+                    // Queue CallKit transaction
+                    if let callUUID = callUUID {
+                        let endCallAction = CXEndCallAction(call: callUUID)
+                        let transaction = CXTransaction(action: endCallAction)
 
-            // Also terminate the call in the core
-            if let call = core.currentCall {
-                try call.terminate()
-            }
+                        try await callQueue.enqueue {
+                            try await self.callController.request(transaction)
+                        }
+                    }
 
-            return .success(())
-        } catch {
-            return .failure(.callFailed(error.localizedDescription))
+                    // Queue linphone termination
+                    if let call = core.currentCall {
+                        try await callQueue.enqueue {
+                            try call.terminate()
+                        }
+                    }
+
+                    continuation.resume(returning: .success(()))
+                } catch {
+                    continuation.resume(returning: .failure(.callFailed(error.localizedDescription)))
+                }
+            }
         }
     }
 
@@ -360,7 +403,8 @@ public class DACallService: NSObject {
         update.supportsGrouping = false
         update.supportsUngrouping = false
         update.localizedCallerName =
-            call.remoteAddress?.displayName?.capitalized ?? call.remoteAddress?.username?.capitalized
+            call.remoteAddress?.displayName?.capitalized ?? call.remoteAddress?
+                .username?.capitalized
                 ?? "Unknown"
 
         provider?.reportNewIncomingCall(with: uuid, update: update) { error in
@@ -396,5 +440,10 @@ public class DACallService: NSObject {
                     "Failed to end CallKit call: \(error.localizedDescription)")
             }
         }
+    }
+
+    @MainActor
+    private func requestCallTransaction(_ transaction: CXTransaction) async throws {
+        try await callController.request(transaction)
     }
 }
